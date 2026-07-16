@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Customer Service IVR</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    font-family:Arial,Helvetica,sans-serif;
+    background:#000;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    min-height:100vh;
+
+    overflow:hidden;
+}
+
+body::before{
+
+    content:"";
+
+    position:fixed;
+
+    inset:0;
+
+    background:url("images/logo.jpeg") center center no-repeat;
+
+    background-size:contain;
+
+    transition:.8s;
+
+    z-index:-1;
+
+}
+
+body.blur::before{
+
+    filter:blur(12px) brightness(40%);
+
+}
+
+.hidden{
+
+    display:none!important;
+
+}
+
+/* ---------------- PHONE ---------------- */
+
+.phone{
+
+    width:350px;
+
+    background:#000;
+
+    padding:30px;
+
+    border-radius:20px;
+
+    text-align:center;
+
+    box-shadow:0 0 20px rgba(255,255,255,.2);
+
+}
+
+.logo{
+
+    width:120px;
+
+    height:120px;
+
+    border-radius:50%;
+
+    border:3px solid #007bff;
+
+    object-fit:cover;
+
+    margin-bottom:20px;
+
+}
+
+.status{
+
+    color:white;
+
+    margin:20px 0;
+
+    min-height:25px;
+
+}
+
+.start{
+
+    padding:15px 40px;
+
+    border:none;
+
+    background:#007bff;
+
+    color:white;
+
+    border-radius:50px;
+
+    cursor:pointer;
+
+    font-size:18px;
+
+}
+
+.keypad{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:15px;
+
+    margin-top:25px;
+
+}
+
+.key{
+
+    width:70px;
+
+    height:70px;
+
+    border-radius:50%;
+
+    background:#1d1d1d;
+
+    color:white;
+
+    font-size:25px;
+
+    border:1px solid #444;
+
+    cursor:pointer;
+
+    margin:auto;
+
+    transition:0.2s;
+
+}
+
+.key.active{
+
+    background:#007bff;
+
+    color:white;
+
+    transform:scale(.92);
+
+    border-color:#4da3ff;
+
+}
+
+/* ---------------- VIDEO ---------------- */
+
+#videoScreen{
+
+    width:90%;
+
+    max-width:1000px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+}
+
+#answerVideo{
+
+    width:100%;
+
+    border-radius:15px;
+
+    background:black;
+
+}
+
+#nextBtn{
+
+    margin-top:20px;
+
+    padding:15px 40px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#007bff;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-size:18px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="phoneScreen" class="phone">
+
+<img
+src="images/logo.jpeg"
+class="logo">
+
+<div
+id="status"
+class="status">
+
+Press Start
+
+</div>
+
+<button
+id="startBtn"
+class="start">
+
+Start
+
+</button>
+
+<div
+id="keypad"
+class="keypad hidden">
+
+<button class="key" onclick="pressKey(1)">1</button>
+<button class="key" onclick="pressKey(2)">2</button>
+<button class="key" onclick="pressKey(3)">3</button>
+
+<button class="key" onclick="pressKey(4)">4</button>
+<button class="key" onclick="pressKey(5)">5</button>
+<button class="key" onclick="pressKey(6)">6</button>
+
+<button class="key" onclick="pressKey(7)">7</button>
+<button class="key" onclick="pressKey(8)">8</button>
+<button class="key" onclick="pressKey(9)">9</button>
+
+<button class="key" onclick="pressKey('*')">*</button>
+<button class="key" onclick="pressKey(0)">0</button>
+<button class="key" onclick="pressKey('#')">#</button>
+
+<div></div>
+
+</div>
+
+</div>
+
+<!-- ================= VIDEO ================= -->
+
+<div
+id="videoScreen"
+class="hidden">
+
+<video
+id="answerVideo"
+controls>
+
+</video>
+
+<button
+id="nextBtn">
+
+Next
+
+</button>
+
+</div>
+
+<script>
+
+const phoneScreen=document.getElementById("phoneScreen");
+
+const videoScreen=document.getElementById("videoScreen");
+
+const status=document.getElementById("status");
+
+const keypad=document.getElementById("keypad");
+
+const startBtn=document.getElementById("startBtn");
+
+const nextBtn=document.getElementById("nextBtn");
+
+const answerVideo=document.getElementById("answerVideo");
+
+let currentAudio=null;
+
+let currentMenu="welcome";
+
+/* =========================
+      IVR TREE
+========================= */
+
+const IVR={
+
+welcome:{
+
+audio:"sounds/welcome.m4a",
+
+next:"main"
+
+},
+
+main:{
+
+audio:"sounds/list1.m4a",
+
+options:{
+
+1:"option1",
+
+2:"option2",
+
+3:"option3",
+
+0:"main"
+
+}
+
+},
+
+option1:{
+
+audio:"sounds/list2.m4a",
+
+options:{
+
+1:"option11",
+
+2:"option12",
+
+3:"option13",
+
+0:"main"
+
+}
+},
+
+option2:{
+
+audio:"sounds/list2.m4a",
+
+options:{
+
+1:"option11",
+
+2:"option12",
+
+3:"option13",
+
+0:"main"
+
+}
+},
+
+option3:{
+
+audio:"sounds/list2.m4a",
+
+options:{
+
+1:"option11",
+
+2:"option12",
+
+3:"option13",
+
+0:"main"
+
+}
+},
+
+option11:{
+
+message:"Choose from 1 to 9",
+
+options:{
+
+1:"O1_1",
+2:"O1_2",
+3:"O1_3",
+4:"O1_4",
+5:"O1_5",
+6:"O1_6",
+7:"O1_7",
+8:"O1_8",
+9:"O1_9",
+
+0:"option1"
+
+}
+
+},
+
+option12:{
+
+message:"Choose from 1 to 8,\n 9 if you need to end call",
+
+options:{
+
+1:"O1_10",
+2:"O1_11",
+3:"O1_12",
+4:"O1_13",
+5:"O1_14",
+6:"O1_15",
+7:"O1_16",
+8:"O1_17",
+9:"outro",
+
+0:"option2"
+
+}
+
+},
+outro:{
+
+audio:"sounds/outro.m4a",
+
+},
+O1_1:{
+
+audio:"sounds/ليه ربنا واحد لكن بنقول الاب والابن والروح القدس.m4a",
+
+options:{
+
+1:"video1",
+
+0:"option1"
+
+}
+
+},
+
+
+O1_2:{
+
+audio:"sounds/ازاي المسيح اله وانسان في نفس الوقت.m4a",
+
+options:{
+
+1:"video2",
+
+0:"option1"
+
+}
+
+},
+
+
+O1_3:{
+
+audio:"sounds/لمن كان يصلي المسيح.m4a",
+
+options:{
+
+1:"video3",
+
+0:"option1"
+
+}
+},
+O1_4:{
+
+audio:"sounds/ليه المسيحية هي الصح.m4a",
+
+options:{
+
+1:"video4",
+
+0:"option1"
+
+}
+},
+O1_5:{
+
+audio:"sounds/ليه فيه طوائف مختلفة.m4a",
+
+options:{
+
+1:"video5",
+
+0:"option1"
+
+}
+},
+O1_6:{
+
+audio:"sounds/هل العلم ضد الدين.m4a",
+
+options:{
+
+1:"video6",
+
+0:"option1"
+
+}
+},
+O1_7:{
+
+audio:"sounds//ليه فيه ايات صعبة.m4a",
+
+options:{
+
+1:"video7",
+
+0:"option1"
+
+}
+},
+O1_8:{
+
+audio:"sounds/مفهوم الانبثاق.m4a",
+
+options:{
+
+1:"video8",
+
+0:"option1"
+
+}
+},
+
+O1_9:{
+
+audio:"sounds//الفرق بين الحلول والاتحاد.m4a",
+
+options:{
+
+1:"video9",
+
+0:"option2"
+
+}
+},
+O1_10:{
+
+audio:"sounds/هل يوجد في المسيحية حسد.m4a",
+
+options:{
+
+1:"video10",
+
+0:"option2"
+
+}
+},
+O1_11:{
+
+audio:"sounds//هل الدينونة ستكون على الخطاة فقط.m4a",
+
+options:{
+
+1:"video11",
+
+0:"option2"
+
+}
+},
+O1_12:{
+
+audio:"sounds/هل فيه خطايا ربنا مش بيسامح عنها.m4a",
+
+options:{
+
+1:"video12",
+
+0:"option2"
+
+}
+},
+O1_13:{
+
+audio:"sounds/ليه فيه ناس مش هتخلص.m4a",
+
+options:{
+
+1:"video13",
+
+0:"option2"
+
+}
+},
+
+O1_14:{
+
+audio:"sounds/لو وقعت في نفس الخطية كذا مرة.m4a",
+
+options:{
+
+1:"video14",
+
+0:"option2"
+}
+},
+O1_15:{
+
+audio:"sounds/لو مكسوف من الاعتراف.m4a",
+
+options:{
+
+1:"video15",
+
+0:"option2"
+}
+},
+
+O1_16:{
+
+audio:"sounds/ليه ربنا احتاج انه يتجسد.m4a",
+
+options:{
+
+1:"video16",
+
+0:"option3"
+
+},
+
+},
+O1_17:{
+
+audio:"sounds/الخلاص بالايمان بس و لا لازم الاعمال.m4a",
+
+options:{
+
+1:"video17",
+
+0:"option3"
+
+},
+},
+"video1": { "video": "videos/ليه ربنا واحد لكن بنقول الاب والابن والروح القدس.mp4", "next": "option1" },
+"video2": { "video": "videos/ازاي المسيح اله وانسان في نفس الوقت.mp4", "next": "option1" },
+"video3": { "video": "videos/لمن كان يصلي المسيح.mp4", "next": "option1" },
+"video4": { "video": "videos/ليه المسيحية هي الصح.mp4", "next": "option1" },
+"video5": { "video": "videos/ليه فيه طوائف مختلفة.mp4", "next": "option1" },
+"video6": { "video": "videos/هل العلم ضد الدين.mp4", "next": "option1" },
+"video7": { "video": "videos/ليه فيه ايات صعبة.mp4", "next": "option1" },
+"video8": { "video": "videos/مفهوم الانبثاق.mp4", "next": "video18" },
+"video9": { "video": "videos/الفرق بين الحلول والاتحاد.mp4", "next": "option1" },
+"video10": { "video": "videos/هل يوجد في المسيحية حسد.mp4", "next": "option2" },
+"video11": { "video": "videos/هل الدينونة ستكون على الخطاة فقط.mp4", "next": "option2" },
+"video12": { "video": "videos/هل فيه خطايا ربنا مش بيسامح عنها.mp4", "next": "option2" },
+"video13": { "video": "videos/ليه فيه ناس مش هتخلص.mp4", "next": "option2" },
+"video14": { "video": "videos/لو وقعت في نفس الخطية كذا مرة.mp4", "next": "option2" },
+"video15": { "video": "videos/لو مكسوف من الاعتراف.mp4", "next": "option2" },
+"video16": { "video": "videos/ليه ربنا احتاج انه يتجسد.mp4", "next": "option2" },
+"video17": { "video": "videos/الخلاص بالايمان بس و لا لازم الاعمال.mp4", "next": "option2" },
+"video18": { "video": "videos/لماذا يختلف الكاثوليك معنا علي الروح القدس.mp4", "next": "option1" }
+
+};
+
+/* =========================
+      AUDIO FUNCTIONS
+========================= */
+
+function stopCurrentAudio(){
+
+    if(currentAudio){
+
+        currentAudio.pause();
+        currentAudio.currentTime=0;
+
+    }
+
+}
+
+function playAudio(file){
+
+    stopCurrentAudio();
+
+    currentAudio = new Audio(file);
+
+    currentAudio.play().catch(err=>console.log(err));
+
+    return currentAudio;
+
+}
+
+/* =========================
+      START CALL
+========================= */
+
+startBtn.addEventListener("click",startCall);
+
+function startCall(){
+
+    startBtn.classList.add("hidden");
+
+    let seconds = 3;
+
+    status.innerText = "Connecting in "+seconds+"...";
+
+    const timer = setInterval(()=>{
+
+        seconds--;
+
+        if(seconds>0){
+
+            status.innerText="Connecting in "+seconds+"...";
+
+        }
+
+        else{
+
+            clearInterval(timer);
+
+            document.body.classList.add("blur");
+
+            keypad.classList.remove("hidden");
+
+            playMenu("welcome");
+
+        }
+
+    },1000);
+
+}
+
+/* =========================
+      PLAY MENU
+========================= */
+
+function playMenu(menuName){
+
+    const menu = IVR[menuName];
+    // If the menu doesn't exist, replay the current menu
+    if(!menu){
+
+        console.warn("Menu not found:", menuName);
+
+        if(menuName !== currentMenu){
+            playMenu(currentMenu);
+        }
+
+        return;
+    }
+
+    currentMenu = menuName;
+
+    // Video node
+    if(menu.video){
+
+        showVideo(menu.video, menu.next);
+        return;
+
+    }
+
+if(menu.audio){
+
+    status.innerText = "Playing...";
+
+    const audio = playAudio(menu.audio);
+
+    audio.onended = () => {
+
+        if(menu.next){
+
+            playMenu(menu.next);
+            return;
+        }
+
+        status.innerText = "Choose an option";
+
+    };
+
+}
+else{
+
+    status.innerText = menu.message || "Choose an option";
+
+}
+
+}
+
+/* =========================
+      VIDEO SCREEN
+========================= */
+
+let returnMenu = "main";
+
+function showVideo(videoFile,nextMenu){
+
+    returnMenu = nextMenu;
+
+    stopCurrentAudio();
+
+    phoneScreen.classList.add("hidden");
+
+    videoScreen.classList.remove("hidden");
+
+    answerVideo.src = videoFile;
+
+    answerVideo.load();
+
+    answerVideo.play();
+
+}
+
+nextBtn.addEventListener("click",backToPhone);
+
+function backToPhone(){
+
+    answerVideo.pause();
+
+    answerVideo.currentTime=0;
+
+    videoScreen.classList.add("hidden");
+
+    phoneScreen.classList.remove("hidden");
+
+    playMenu(returnMenu);
+
+}
+
+/* =========================
+      KEYPAD
+========================= */
+
+function pressKey(number){
+
+const keys = document.querySelectorAll(".key");
+
+keys.forEach(key => {
+
+    if(key.innerText == number){
+
+        key.classList.add("active");
+
+        setTimeout(()=>{
+
+            key.classList.remove("active");
+
+        },200);
+
+    }
+
+});
+    stopCurrentAudio();
+
+    if(number == "#"){
+
+        playMenu("main");
+
+        return;
+    }
+
+    if(number == "*"){
+
+        playMenu(currentMenu);
+
+        return;
+    }
+
+    const menu = IVR[currentMenu];
+
+    if(!menu){
+
+        status.innerText="Unknown menu";
+        return;
+
+    }
+
+    if(!menu.options){
+
+        status.innerText="No options available";
+
+        return;
+
+    }
+
+    const nextMenu = menu.options[number];
+
+    if(!nextMenu){
+
+        status.innerText="Invalid option";
+        playMenu(currentMenu);
+
+        setTimeout(()=>{
+
+            status.innerText="Choose an option";
+
+        },1000);
+
+        return;
+
+    }
+
+    playMenu(nextMenu);
+
+}
+
+
+/* =========================
+      KEYBOARD SUPPORT
+========================= */
+
+document.addEventListener("keydown",(event)=>{
+
+    const key = event.key;
+
+    if((key>="0" && key<="9") ||
+        key=="*" ||
+        key=="#"){
+
+        pressKey(key);
+
+    }
+
+});
+
+
+/* =========================
+      OPTIONAL:
+      REPLAY CURRENT MENU
+      Press R
+========================= */
+
+document.addEventListener("keydown",(event)=>{
+
+    if(event.key.toLowerCase()=="r"){
+
+        playMenu(currentMenu);
+
+    }
+
+});
+
+
+/* =========================
+      OPTIONAL:
+      ESC CLOSES VIDEO
+========================= */
+
+document.addEventListener("keydown",(event)=>{
+
+    if(event.key==="Escape" || event.key==="Enter"){
+
+        if(!videoScreen.classList.contains("hidden")){
+
+            backToPhone();
+
+        }
+
+    }
+
+});
+
+
+/* =========================
+      VIDEO ENDED
+========================= */
+
+answerVideo.addEventListener("ended",()=>{
+
+    nextBtn.focus();
+
+});
+/* ======================
+        End Call
+=====================*/
+
+function endCall() {
+
+    stopCurrentAudio();
+
+    currentMenu = "welcome";
+
+    status.innerText = "Call Ended";
+
+    keypad.classList.add("hidden");
+
+    startBtn.classList.remove("hidden");
+
+    document.body.classList.remove("blur");
+
+    phoneScreen.classList.remove("hidden");
+
+    videoScreen.classList.add("hidden");
+
+    answerVideo.pause();
+    answerVideo.currentTime = 0;
+
+}
+
+/* =========================
+      READY
+========================= */
+
+status.innerText="Press Start";
+
+</script>
+</body>
+</html>
