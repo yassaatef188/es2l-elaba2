@@ -4,7 +4,7 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<link rel="icon" type="image/jpeg" href="images/logo.jpeg"> 
 <title>Es2al Elaba2</title>
 
 <style>
@@ -74,6 +74,16 @@ body.blur::before{
     text-align:center;
 
     box-shadow:0 0 20px rgba(255,255,255,.2);
+
+    transition: opacity .8s ease;
+
+}
+
+.phone.hide{
+
+    opacity:0;
+
+    pointer-events:none;
 
 }
 
@@ -319,10 +329,22 @@ const IVR={
 welcome:{
 
 audio:"sounds/welcome.m4a",
+options:{
+1:"main",
+2:"welcome",
+3:"welcome",
+4:"welcome",
+5:"welcome",
+6:"welcome",
+7:"welcome",
+8:"welcome",
+9:"welcome",
+},
 
 next:"main"
 
 },
+
 
 main:{
 
@@ -395,7 +417,8 @@ options:{
 
 option11:{
 
-message:"Choose from 1 to 9",
+message:"Choose from 1 to 9\n To end call, press *",
+
 
 options:{
 
@@ -417,7 +440,7 @@ options:{
 
 option12:{
 
-message:"Choose from 1 to 8,\n 9 if you need to end call",
+message:"Choose from 1 to 8,\n To end call, press *",
 
 options:{
 
@@ -429,18 +452,19 @@ options:{
 6:"O1_15",
 7:"O1_16",
 8:"O1_17",
-9:"outro",
+9:"option12",
 
 0:"option2"
 
 }
 
 },
-outro:{
+endCall :{
 
 audio:"sounds/outro.m4a",
-
+endCall:true
 },
+    
 O1_1:{
 
 audio:"sounds/ليه ربنا واحد لكن بنقول الاب والابن والروح القدس.m4a",
@@ -546,7 +570,7 @@ options:{
 
 O1_9:{
 
-audio:"sounds//الفرق بين الحلول والاتحاد.m4a",
+audio:"sounds/الفرق بين الحلول والاتحاد.m4a",
 
 options:{
 
@@ -864,14 +888,14 @@ keys.forEach(key => {
 
     if(number == "#"){
 
-        playMenu("main");
+        playMenu(currentMenu);
 
         return;
     }
 
     if(number == "*"){
 
-        playMenu(currentMenu);
+        playMenu("endCall");
 
         return;
     }
@@ -1006,7 +1030,17 @@ function endCall() {
     answerVideo.currentTime = 0;
 
 }
+function hidePhoneAfterDelay(seconds = 3){
 
+    setTimeout(() => {
+
+        phoneScreen.classList.add("hidden");
+
+        document.body.classList.remove("blur");
+
+    }, seconds * 1000);
+
+}
 /* =========================
       READY
 ========================= */
