@@ -121,3 +121,184 @@ The application includes a virtual telephone keypad:
 4  5  6
 7  8  9
 *  0  #
+```
+
+### Special Keys
+
+| Key | Function |
+|-----|----------|
+| `0` | Navigate to the main menu |
+| `*` | End the call |
+| `#` | Replay the current menu |
+
+---
+
+## ⌨️ Keyboard Controls
+
+The application also supports keyboard input for easier navigation.
+
+| Keyboard Key | Action |
+|---------------|--------|
+| `0 - 9` | Select a keypad option |
+| `*` | End the call |
+| `#` | Replay the current menu |
+| `R` | Replay the current menu |
+| `Enter` | Close the video and return to the menu |
+| `Esc` | Close the video and return to the menu |
+
+---
+
+## 🛠️ Technologies Used
+
+- **HTML5**
+- **CSS3**
+- **JavaScript**
+- **HTML5 Audio API**
+- **HTML5 Video API**
+- **Git**
+- **GitHub**
+- **GitHub Pages**
+
+---
+
+## 📂 Project Structure
+
+```text
+es2l-elaba2/
+│
+├── .github/
+│   └── workflows/
+│
+├── images/
+│   └── logo.jpeg
+│
+├── sounds/
+│   ├── welcome.m4a
+│   ├── list1.m4a
+│   ├── list2.m4a
+│   ├── outro.m4a
+│   └── ...
+│
+├── index.html
+│
+└── README.md
+```
+
+---
+
+## 🧩 Application Architecture
+
+The application uses a JavaScript-based **IVR tree structure** to control the navigation flow.
+
+Each menu can contain:
+
+- An audio file
+- Available keypad options
+- A destination menu
+- A video answer
+- A next destination
+
+This structure makes it easy to add new menus, questions, audio files, and video answers without changing the overall application architecture.
+
+---
+
+## 🚀 Running the Project Locally
+
+### Clone the repository
+
+```bash
+git clone https://github.com/yassaatef188/es2l-elaba2.git
+```
+
+### Open the project
+
+Navigate to the project directory:
+
+```bash
+cd es2l-elaba2
+```
+
+You can then open:
+
+```text
+index.html
+```
+
+directly in a modern web browser.
+
+For the best development experience, you can also use **VS Code + Live Server**.
+
+---
+
+## 🌐 Live Demo
+
+You can try the application directly from your browser:
+
+### 👉 [Open Es2al Elaba2](https://yassaatef188.github.io/es2l-elaba2/)
+
+No installation or setup is required.
+
+---
+
+## 📸 Project Preview
+
+The application provides a phone-style interface with:
+
+- Project logo
+- Start button
+- Virtual keypad
+- Audio status
+- Interactive menus
+- Video answer screen
+
+---
+
+## 🎯 Project Goals
+
+The project was created to demonstrate how a web application can combine different browser technologies to create an interactive experience.
+
+The main goals were to:
+
+- Practice JavaScript programming
+- Work with events and user interactions
+- Implement dynamic navigation
+- Handle audio and video in the browser
+- Organize application logic using a structured data model
+- Build an interactive and user-friendly interface
+- Deploy a static web application using GitHub Pages
+
+---
+
+## 👨‍💻 Developer
+
+### Yassa Atef
+
+Computer Science Student  
+Faculty of Computers and Artificial Intelligence  
+Cairo University
+
+GitHub:  
+https://github.com/yassaatef188
+
+LinkedIn:  
+https://www.linkedin.com/in/yassa-atef/
+
+---
+
+## 📚 Project Type
+
+**Interactive Web Application**
+
+Built using:
+
+**HTML + CSS + JavaScript**
+
+and deployed using:
+
+**GitHub Pages**
+
+---
+
+## 📄 License
+
+This project was created for educational and demonstration purposes.
