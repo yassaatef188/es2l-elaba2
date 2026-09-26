@@ -142,7 +142,6 @@ The application also supports keyboard input for easier navigation.
 | `0 - 9` | Select a keypad option |
 | `*` | End the call |
 | `#` | Replay the current menu |
-| `R` | Replay the current menu |
 | `Enter` | Close the video and return to the menu |
 | `Esc` | Close the video and return to the menu |
 
